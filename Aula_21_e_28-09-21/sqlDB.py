@@ -7,8 +7,6 @@ Database password: 9vVIK9d3qA
 Port number: 3306
 
 '''
-import pyodbc
-
 import mysql.connector
 
 cnx = mysql.connector.connect(
@@ -44,7 +42,25 @@ cnx.commit()
 cursor.close()
 cnx.close()
 '''
+def insertRegister(pessoa):
+    cursor = cnx.cursor()
+    # val = {"nome":"Roberta Miranda", "idade":"35", "altura":"1.80", "pais":"Brasil"}
+    cursor.execute("INSERT INTO Pessoa (nome, idade, altura, pais) VALUES (%s, %s, %s, %s)", (pessoa['nome'], pessoa['idade'], pessoa['altura'], pessoa['pais']))
+    cnx.commit()
+
+    cursor.close()
+    print('Registro inserido com sucesso!')
 
 
-cursor.execute("SELECT * FROM `Pessoa`")
+def buscaTodosRegistros():
+    cursor = cnx.cursor()
+    cursor.execute("SELECT * FROM Pessoa")
+    result = cursor.fetchall()
+    aux = []
+    for i in result:
+        aux.append(i)
 
+    cursor.close()
+    return aux
+
+#print(buscaTodosRegistros())
