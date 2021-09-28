@@ -17,6 +17,7 @@ result = collection.find()
 def insertRegister(array):
     val = {f"nome":array[1], "idade":array[2], "altura":array[3], "pais":array[4]}
     x = collection.insert_one(val)
+    print('Registro inserido com sucesso!')
 
 
 def buscaTodosRegistros():
@@ -25,6 +26,3 @@ def buscaTodosRegistros():
     for i in result:
         aux.append(i)
     return aux
-
-
-insertRegister((1, 'Carlos Alberto', '40', '1.70', 'Brasil'))
