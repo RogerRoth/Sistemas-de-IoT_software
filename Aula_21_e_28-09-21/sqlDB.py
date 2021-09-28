@@ -48,4 +48,3 @@ cnx.close()
 
 cursor.execute("SELECT * FROM `Pessoa`")
 
-print(pessoa)
