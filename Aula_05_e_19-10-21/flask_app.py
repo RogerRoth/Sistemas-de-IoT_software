@@ -1,3 +1,7 @@
+#http://rogerroth.pythonanywhere.com/
+#http://rogerroth.pythonanywhere.com/ws
+#https://rogerroth.pythonanywhere.com/find?condition=temperature>20
+
 from flask import Flask, request, make_response, jsonify
 import json
 import sqlite3
