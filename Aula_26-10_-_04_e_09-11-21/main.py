@@ -1,4 +1,3 @@
-import os
 import pandas as pd 
 import sys
 import matplotlib.pyplot as plt
@@ -8,13 +7,6 @@ from math import floor
 import getopt
 
 warnings.filterwarnings('ignore')
-
-__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
-def openTrainingSet(fileName) :
-    trainingSet = pd.read_csv(os.path.join(__location__, 'data', fileName))
-
-    return trainingSet
 
 def calculateInterval(filePath, interval):
     df = pd.read_csv(filePath)
