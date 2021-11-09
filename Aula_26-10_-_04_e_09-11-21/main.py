@@ -1,6 +1,13 @@
-
 import os
 import pandas as pd 
+import sys
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+import warnings
+from math import floor
+import getopt
+
+warnings.filterwarnings('ignore')
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -9,49 +16,32 @@ def openTrainingSet(fileName) :
 
     return trainingSet
 
-def datasetTreatment():
-    
-    dataSet = openTrainingSet('nir.csv')
+def calculateInterval(filePath, interval):
+    df = pd.read_csv(filePath)
 
-    #Tratamento dos dados
+    intervalSize = floor((len(df)-1)/interval)
 
-    dataSet.drop(['Sample'], axis = 1, inplace=True)
+    classes = df.iloc[0, 1:].to_numpy()
+    data = df.iloc[1:, 1:].to_numpy().T
 
-    print(dataSet)
-    return(dataSet)
+    for i in range(interval):
+        if i == 0:
+            init = i * intervalSize
+        else:
+            init = i * intervalSize + 1
+        if i == interval - 1:
+            final = len(data[0])
+        else:
+            final = init + intervalSize
+        dataAux = data[:, init:final]
 
+        pca = PCA(n_components=3)
+        scores = pca.fit_transform(dataAux)
+        titleAux = f'[{init} - {final}]'
+        scatter(scores, classes, titleAux)
 
-import numpy as np
-import sys
-import matplotlib.pyplot as plt
-from scipy.signal import savgol_filter
-from sklearn.cross_decomposition import PLSRegression
-from sklearn.model_selection import LeaveOneOut, cross_val_predict, KFold
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-from sklearn import svm
-from sklearn.cluster import KMeans
-from scipy.cluster.hierarchy import dendrogram
-from sklearn.cluster import AgglomerativeClustering
-from sklearn import svm
-from sklearn.preprocessing import StandardScaler
-from sklearn import linear_model
-import joblib
-import warnings
-
-warnings.filterwarnings('ignore')
-
-def plot(x,y):
-    with plt.style.context(('ggplot')):
-        plt.plot(x,y)
-        plt.xlabel(u'Wavelength')
-        plt.ylabel(u'Intensisty')
-        plt.title(u'Spectra chart')
-        plt.show()
 		
-def scatter(scores, classes):
+def scatter(scores, classes, title):
     unique = list(set(classes))
     colors = [plt.cm.jet(float(i)/max(unique)) for i in unique]
     with plt.style.context(('ggplot')):
@@ -63,45 +53,25 @@ def scatter(scores, classes):
         plt.xlabel('PC1')
         plt.ylabel('PC2')
         #plt.legend(labplot,loc='lower right')
-        plt.title('Principal Component Analysis')
+        plt.title(f'Principal Component Analysis - {title}')
     plt.show()
 
-def snv(input_data):          
-    # Define a new array and populate it with the corrected data        
-    output_data = np.zeros_like(input_data)      
-    for i in range(input_data.shape[0]):            
-        # Apply correction          
-        output_data[i,:] = (input_data[i,:] - np.mean(input_data[i,:])) / np.std(input_data[i,:])        
-    return output_data
-	
-#df = pd.read_csv("nir.csv")
-df = openTrainingSet('nir.csv')
+filepath = ''
+interval = ''
+argv = sys.argv[1:]
 
+try:
+    options, args = getopt.getopt(argv, 'f:i:', ['file =', 'interval ='])
 
-#sys.exit()
+except:
+    print('Incorrect parameters')
 
-wave = df.iloc[1:,0].to_numpy()
+for name, value in options:
+    if name in ['-f', '--file']:
+        filePath = value
+    elif name in ['-i', '--interval']:
+        interval = value
 
+calculateInterval(filePath, int(interval))
 
-#sys.exit()
-data = df.iloc[1:,1:].to_numpy().T
-
-
-classes = df.iloc[0,1:].to_numpy()
-
-
-plot(wave,data.T)
-
-#sys.exit()
-
-#não-supervisionado
-print('PCA')
-pca = PCA(n_components=3)
-scores = pca.fit_transform(data)
-scatter(scores, classes)
-
-data = data[:,2857:2909]
-pca = PCA(n_components=4)
-data = savgol_filter(snv(data), 5, polyorder = 2, deriv=1)
-scores = pca.fit_transform(data)
-scatter(scores, classes)
+#& C:/Python39/python.exe "f:/Roger/Faculdade/Sistemas de IoT/Software/Aula_26-10_-_04_e_09-11-21/main.py" -f 'Aula_26-10_-_04_e_09-11-21/data/nir.csv' -i 3
